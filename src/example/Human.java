@@ -8,4 +8,11 @@ public class Human extends Entity {
     public Human (String name) {
         this.name = name;
     }
+    @Override
+    public Human copy() {
+        Human copyhuman = new Human(name);
+        copyhuman.id = id;
+
+        return copyhuman;
+    }
 }
