@@ -2,6 +2,7 @@ package db;
 
 import db.exeption.EntityNotFoundExeption;
 import db.exeption.InvalidEntityException;
+import example.Document;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,18 +15,16 @@ public class Database {
 
     private static HashMap<Integer, Validator> validators = new HashMap<>();
 
-    private Database (){}
-
     public static void add (Entity e) throws InvalidEntityException {
         Validator validator = validators.get(e.getEntityCode());
         if (validator != null) {
             validator.validate(e);
         }
-        if (e instanceof Trackable) {
-            Trackable trackable = (Trackable) e;
+        if (e instanceof Document) {
+            Document document = (Document) e;
             Date now = new Date();
-            trackable.setCreationDate(now);
-            trackable.setLastModificationDate(now);
+            document.setCreationDate(now);
+            document.setLastModificationDate(now);
         }
         e.id = nextId ++;
         entities.add(e.copy());
@@ -50,13 +49,17 @@ public class Database {
         if (validator != null) {
             validator.validate(e);
         }
-        if (e instanceof Trackable) {
-            Trackable trackable = (Trackable) e;
-            trackable.setLastModificationDate(new Date());
+        if (e instanceof Document) {
+            Document document = (Document) e;
+            document.setLastModificationDate(new Date());
         }
-        Entity existing = get(e.id);
-        int index = entities.indexOf(existing);
-        entities.set(index, e.copy());
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i).id == e.id) {
+                entities.set(i, e.copy());
+                return;
+            }
+        }
+        throw new EntityNotFoundExeption(e.id);
     }
 
     public static void registerValidator (int entitycode, Validator validator) {
