@@ -2,11 +2,11 @@ package db;
 
 import db.exeption.EntityNotFoundExeption;
 import db.exeption.InvalidEntityException;
-import example.Document;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class Database {
     private static final ArrayList<Entity> entities = new ArrayList<>();
@@ -20,11 +20,11 @@ public class Database {
         if (validator != null) {
             validator.validate(e);
         }
-        if (e instanceof Document) {
-            Document document = (Document) e;
+        if (e instanceof Trackable) {
+            Trackable trackable = (Trackable) e;
             Date now = new Date();
-            document.setCreationDate(now);
-            document.setLastModificationDate(now);
+            trackable.setCreationDate(now);
+            trackable.setLastModificationDate(now);
         }
         e.id = nextId ++;
         entities.add(e.copy());
@@ -49,9 +49,9 @@ public class Database {
         if (validator != null) {
             validator.validate(e);
         }
-        if (e instanceof Document) {
-            Document document = (Document) e;
-            document.setLastModificationDate(new Date());
+        if (e instanceof Trackable) {
+            Trackable trackable = (Trackable) e;
+            trackable.setLastModificationDate(new Date());
         }
         for (int i = 0; i < entities.size(); i++) {
             if (entities.get(i).id == e.id) {
@@ -68,4 +68,15 @@ public class Database {
         }
         validators.put(entitycode, validator);
     }
+
+    public static List<Entity> getAll (int entitycode) {
+        List<Entity> result = new ArrayList<>();
+        for (Entity entity : entities) {
+            if (entity.getEntityCode() == entitycode){
+                result.add(entity.copy());
+            }
+        }
+        return result;
+    }
+
 }
